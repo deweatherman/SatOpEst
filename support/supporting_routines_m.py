@@ -289,13 +289,13 @@ def splitX(x):
     assert len(t_index) == len(h_index)
     assert (len(t_index)*2 +len(w_index)) == len(x)
 
-    xt = x[t_index]
+    xt = x.loc[t_index]
     xt.index = h_index
 
-    xq = x[q_index]
+    xq = x.loc[q_index]
     xq.index = h_index
 
-    xw = x[w_index]
+    xw = x.loc[w_index]
     xw.index = s_index
 
     xt.index.name = 'height'
@@ -320,16 +320,16 @@ def splitXUV(x):
     assert len(t_index) == len(h_index)
     assert (len(t_index)*2 +len(u_index)+len(v_index)) == len(x)
 
-    xt = x[t_index]
+    xt = x.loc[t_index]
     xt.index = h_index
 
-    xq = x[q_index]
+    xq = x.loc[q_index]
     xq.index = h_index
 
-    xu = x[u_index]
+    xu = x.loc[u_index]
     xu.index = su_index
 
-    xv = x[v_index]
+    xv = x.loc[v_index]
     xv.index = sv_index
 
     xt.index.name = 'height'
@@ -354,13 +354,13 @@ def splitQX(x):
     #assert len(t_index) == len(h_index)
     assert (len(t_index) + len(q_index) +len(w_index)) == len(x)
 
-    xt = x[t_index]
+    xt = x.loc[t_index]
     xt.index = h_index_T
 
-    xq = x[q_index]
+    xq = x.loc[q_index]
     xq.index = h_index_Q
 
-    xw = x[w_index]
+    xw = x.loc[w_index]
     xw.index = s_index
 
     xt.index.name = 'height'
@@ -403,22 +403,22 @@ def splitX_all(x):
                             len(btsk_index) ) == len(x)
                             #len(bh2m_index)+len(btsk_index) ) == len(x)
     # State vector output
-    xt = x[t_index]
+    xt = x.loc[t_index]
     xt.index = h_index
-    xq = x[q_index]
+    xq = x.loc[q_index]
     xq.index = h_index
-    xu = x[u_index]
+    xu = x.loc[u_index]
     xu.index = su_index
-    xv = x[v_index]
+    xv = x.loc[v_index]
     xv.index = sv_index
     # Parameters vector output:
-    xbp2m = x[bp2m_index]
+    xbp2m = x.loc[bp2m_index]
     xbp2m.index = sbp2m_index 
-    xbt2m = x[bt2m_index]
+    xbt2m = x.loc[bt2m_index]
     xbt2m.index = sbt2m_index
-    #xbh2m = x[bh2m_index]
+    #xbh2m = x.loc[bh2m_index]
     #xbh2m.index = sbh2m_index
-    xbtsk = x[btsk_index]
+    xbtsk = x.loc[btsk_index]
     xbtsk.index = sbtsk_index
 
     xt.index.name = 'height'
@@ -467,22 +467,22 @@ def splitX_all_2(x):
 
     # State vector output
 
-    xtsk = x[skt_index]
+    xtsk = x.loc[skt_index]
     xtsk.index = sskt_index   
-    xu = x[u_index]
+    xu = x.loc[u_index]
     xu.index = su_index
-    xv = x[v_index]
+    xv = x.loc[v_index]
     xv.index = sv_index
     
     # Parameters vector output:
 
-    xt = x[t_index]
+    xt = x.loc[t_index]
     xt.index = h_index
-    xq = x[q_index]
+    xq = x.loc[q_index]
     xq.index = h_index 
-    xt2m = x[t2m_index]
+    xt2m = x.loc[t2m_index]
     xt2m.index = st2m_index
-    xsp = x[sp_index]
+    xsp = x.loc[sp_index]
     xsp.index = ssp_index           
 
     xu.index.name = 'pressure'
@@ -529,21 +529,21 @@ def splitXW_all(x):
                             len(btsk_index) ) == len(x)
                             #len(bh2m_index)+len(btsk_index) ) == len(x)
     # State vector output
-    xt = x[t_index]
+    xt = x.loc[t_index]
     xt.index = h_index
-    xq = x[q_index]
+    xq = x.loc[q_index]
     xq.index = h_index
-    xw = x[w_index]
+    xw = x.loc[w_index]
     xw.index = sw_index
 
     # Parameters vector output:
-    xbp2m = x[bp2m_index]
+    xbp2m = x.loc[bp2m_index]
     xbp2m.index = sbp2m_index 
-    xbt2m = x[bt2m_index]
+    xbt2m = x.loc[bt2m_index]
     xbt2m.index = sbt2m_index
-    #xbh2m = x[bh2m_index]
+    #xbh2m = x.loc[bh2m_index]
     #xbh2m.index = sbh2m_index
-    xbtsk = x[btsk_index]
+    xbtsk = x.loc[btsk_index]
     xbtsk.index = sbtsk_index
 
     xt.index.name = 'height'
