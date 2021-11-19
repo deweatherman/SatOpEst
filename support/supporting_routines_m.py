@@ -498,6 +498,75 @@ def splitX_all_2(x):
 # *****************************************************
 # *****************************************************
 
+# *****************************************************
+
+def splitX_all_2W(x):
+
+    # State vector
+    skt_index = [i for i in x.index if i.endswith('skt')]  
+    #u_index = [i for i in x.index if i.endswith('u10')]
+    #v_index = [i for i in x.index if i.endswith('v10')]
+    w_index = [i for i in x.index if i.endswith('w10')]
+    # State vector indices   
+    #su_index = [float(i.split('_')[0]) for i in x.index if i.endswith('u10')]
+    #sv_index = [float(i.split('_')[0]) for i in x.index if i.endswith('v10')]
+    sw_index = [float(i.split('_')[0]) for i in x.index if i.endswith('w10')]
+    sskt_index = [float(i.split('_')[0]) for i in x.index if i.endswith('skt')]
+
+    # Parameters vector:
+    t_index = [i for i in x.index if i.endswith('temp')]
+    q_index = [i for i in x.index if i.endswith('hum')]   
+    t2m_index = [i for i in x.index if i.endswith('t2m')]
+    sp_index = [i for i in x.index if i.endswith('sp')]
+    
+    # Parameters vector indices:
+    h_index = [float(i.split('_')[0]) for i in x.index if i.endswith('temp')]
+    st2m_index = [float(i.split('_')[0]) for i in x.index if i.endswith('t2m')]  
+    ssp_index = [float(i.split('_')[0]) for i in x.index if i.endswith('sp')]
+
+    
+    assert len(t_index) == len(q_index)
+    assert len(t_index) == len(h_index)
+    assert (len(t_index)*2 +len(w_index)+
+                            #len(v_index)+
+                            len(t2m_index)+
+                            len(sp_index)+
+                            len(sskt_index) ) == len(x)
+
+    # State vector output
+
+    xtsk = x.loc[skt_index]
+    xtsk.index = sskt_index   
+    #xu = x.loc[u_index]
+    #xu.index = su_index
+    #xv = x.loc[v_index]
+    #xv.index = sv_index
+    xw = x.loc[w_index]
+    xw.index = sw_index    
+    # Parameters vector output:
+
+    xt = x.loc[t_index]
+    xt.index = h_index
+    xq = x.loc[q_index]
+    xq.index = h_index 
+    xt2m = x.loc[t2m_index]
+    xt2m.index = st2m_index
+    xsp = x.loc[sp_index]
+    xsp.index = ssp_index           
+
+    #xu.index.name = 'pressure'
+    #xv.index.name = 'pressure'
+    xw.index.name = 'pressure'
+    xtsk.index.name = 'pressure'
+    xt.index.name = 'pressure'
+    xq.index.name = 'pressure'    
+    xt2m.index.name = 'pressure'
+    xsp.index.name = 'pressure'
+
+    return xt, xq, xw, xt2m, xtsk, xsp    
+
+# *****************************************************
+
 def mergeX_all_2(jac, x, rttovObj, perturbation=0.01, LogHum=True):
 
     # State vector
@@ -539,6 +608,63 @@ def mergeX_all_2(jac, x, rttovObj, perturbation=0.01, LogHum=True):
     jac.loc[bt2m_index] = rttovObj.S2mK[0,:,1].reshape(1,len(jac.columns)) 
     jac.loc[u_index] = rttovObj.S2mK[0,:,3].reshape(1,len(jac.columns)) 
     jac.loc[v_index] = rttovObj.S2mK[0,:,4].reshape(1,len(jac.columns)) 
+    
+    jac.loc[btsk_index] = rttovObj.SkinK[0,:,0].reshape(1,len(jac.columns)) # SkinK (nprof,nchan,9)
+
+    
+    return jac
+# *****************************************************
+
+
+# *****************************************************
+
+def mergeX_all_2W(jac, x, rttovObj, perturbation=0.01, LogHum=True):
+
+    # State vector
+    t_index = [i for i in x.index if i.endswith('temp')]
+    q_index = [i for i in x.index if i.endswith('hum')]
+    #u_index = [i for i in x.index if i.endswith('u10')]
+    #v_index = [i for i in x.index if i.endswith('v10')]
+    w_index = [i for i in x.index if i.endswith('w10')] 
+       
+    # Parameters vector:
+    bp2m_index = [i for i in x.index if i.endswith('sp')] 
+    bt2m_index = [i for i in x.index if i.endswith('t2m')]
+    btsk_index = [i for i in x.index if i.endswith('skt')]      
+
+    assert len(t_index) == len(q_index)
+    #assert len(t_index) == len(h_index)
+    assert (len(t_index)*2 +len(w_index)+
+                            #len(v_index)+
+                            len(bp2m_index)+
+                            len(bt2m_index)+
+                            len(btsk_index) ) == len(x.index)
+
+
+    jac.loc[t_index] = (rttovObj.TK[0,:,:]).T # TX, QX (nprof,nchan,nlev) 
+    # In case the humidity is in logarithmic scale: re-scale the linear Jacobian (dy/dq) from RTTOV into log scale (dy/dlog10q)
+    if(LogHum): 
+    
+        hum = (10**(x.loc[q_index].to_numpy(dtype=np.float64).reshape(len(q_index),1))) / 1000.
+        q1 = hum
+        q2 = hum*(1+perturbation) 
+        logK_factor = np.abs((q2-q1)/(np.log10(q2)-np.log10(q1))) 
+
+    else:
+    
+        logK_factor = 1.0 # Humidity is in linear scale, so RTTOV's Jacobian (dy/dq) can be used directly 
+              
+    jac.loc[q_index] = ((rttovObj.QK[0,:,:]).T)*logK_factor # TX, QX (nprof,nchan,nlev) 
+    
+    jac.loc[bp2m_index] = rttovObj.S2mK[0,:,0].reshape(1,len(jac.columns)) # S2mK (nprof,nchan,6)
+    jac.loc[bt2m_index] = rttovObj.S2mK[0,:,1].reshape(1,len(jac.columns)) 
+    #jac.loc[u_index] = rttovObj.S2mK[0,:,3].reshape(1,len(jac.columns)) 
+    #jac.loc[v_index] = rttovObj.S2mK[0,:,4].reshape(1,len(jac.columns)) 
+
+    u_k = rttovObj.S2mK[0,:,3].reshape(1,len(jac.columns)) 
+    v_k = rttovObj.S2mK[0,:,4].reshape(1,len(jac.columns)) 
+        
+    jac.loc[w_index] = 1.4142*(u_k+v_k)
     
     jac.loc[btsk_index] = rttovObj.SkinK[0,:,0].reshape(1,len(jac.columns)) # SkinK (nprof,nchan,9)
 
