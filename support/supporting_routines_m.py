@@ -567,6 +567,21 @@ def splitX_all_2W(x):
 
 # *****************************************************
 
+def splitX_all_2W_np(x):
+
+    return x['temp'], x['hum'],\
+           x['w10'], x['t2m'], x['skt'], x['sp']
+
+# *****************************************************
+
+# *****************************************************
+
+def splitX_all_2W_np_xvars(x):
+
+    return x['w10'], x['skt']
+
+# *****************************************************
+
 def mergeX_all_2(jac, x, rttovObj, perturbation=0.01, LogHum=True):
 
     # State vector
@@ -670,6 +685,47 @@ def mergeX_all_2W(jac, x, rttovObj, perturbation=0.01, LogHum=True):
 
     
     return jac
+# *****************************************************
+
+
+def mergeX_all_2W_np(x, rttovObj, perturbation=0.01, LogHum=True):
+
+    nchan = len(rttovObj.S2mK[0,:,0])  # Number of channels
+    
+    u_k = rttovObj.S2mK[0,:,3].reshape(1,nchan) 
+    v_k = rttovObj.S2mK[0,:,4].reshape(1,nchan) 
+    
+    # In case the humidity is in logarithmic scale: re-scale the linear Jacobian (dy/dq) from RTTOV into log scale (dy/dlog10q)
+    if(LogHum): 
+    
+        hum = (10**(x.loc['hum'].to_numpy(dtype=np.float64).reshape(len(x.loc['hum']),1))) / 1000.
+        q1 = hum
+        q2 = hum*(1+perturbation) 
+        logK_factor = np.abs((q2-q1)/(np.log10(q2)-np.log10(q1))) 
+
+    else:
+    
+        logK_factor = 1.0 # Humidity is in linear scale, so RTTOV's Jacobian (dy/dq) can be used directly 
+
+
+    merged = np.concatenate((1.4142*(u_k+v_k),\
+                             rttovObj.SkinK[0,:,0].reshape(1,nchan),\
+                             rttovObj.S2mK[0,:,0].reshape(1,nchan),\
+                             rttovObj.S2mK[0,:,1].reshape(1,nchan),\
+                             (rttovObj.TK[0,:,:]).T,\
+                             ((rttovObj.QK[0,:,:]).T)*logK_factor),axis=0)
+    
+    #jac.loc[t_index] = (rttovObj.TK[0,:,:]).T # TX, QX (nprof,nchan,nlev)               
+    #jac.loc[q_index] = ((rttovObj.QK[0,:,:]).T)*logK_factor # TX, QX (nprof,nchan,nlev) 
+    #jac.loc[bp2m_index] = rttovObj.S2mK[0,:,0].reshape(1,len(jac.columns)) # S2mK (nprof,nchan,6)
+    #jac.loc[bt2m_index] = rttovObj.S2mK[0,:,1].reshape(1,len(jac.columns)) 
+    #jac.loc[u_index] = rttovObj.S2mK[0,:,3].reshape(1,len(jac.columns)) 
+    #jac.loc[v_index] = rttovObj.S2mK[0,:,4].reshape(1,len(jac.columns))    
+    #jac.loc[w_index] = 1.4142*(u_k+v_k)  
+    #jac.loc[btsk_index] = rttovObj.SkinK[0,:,0].reshape(1,len(jac.columns)) # SkinK (nprof,nchan,9)
+
+    
+    return merged
 # *****************************************************
 
 
