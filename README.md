@@ -13,14 +13,12 @@ and apriori data.
 
 ## Purpose of the repo
 
-This is a first version of the modules and the repo is intended as a practical
-way to practice version control using Git as a day-to-day way of working.
+This is a first version of the different modules; there is a lot to be improved in terms of code quality and speed.
 
 
 ## Documentation
 
-Coming soon.
-
+Each Jupyter notebook is documented accordingly.
 
 
 
