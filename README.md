@@ -28,7 +28,7 @@ This work was kicked off in the context of a project of EUMETSAT's Ocean and Sea
 
 ## Citation and Contribution
 
-This repo is part of the supplementary materials of our work: "M. Echeverri, A. Verhoef, A. Stoffelen, M. Maahn. Atmospheric Retrievals in a Modern Python Framework. *EGU22, the 24th EGU General Assembly, held 23-27 May, 2022 in Vienna, Austria and Online*". **Slides** can be found [here](https://meetingorganizer.copernicus.org/EGU22/EGU22-13556.html?pdf)
+This repo is part of the supplementary materials of our work: "M. Echeverri, A. Verhoef, A. Stoffelen, M. Maahn. Atmospheric Retrievals in a Modern Python Framework. *EGU22, the 24th EGU General Assembly, held 23-27 May, 2022 in Vienna, Austria and Online*". **Slides** can be found [here](https://github.com/deweatherman/SatOpEst/blob/main/OptEst_framework_EGU_v1.pdf)
 
 If you use these materials please consider citing the mentioned work!
 
